@@ -702,36 +702,4 @@ asn1_parser_error_t dump_asn1_tree(asn1_tree_t tree) {
     dump_recv(tree, 0);
 }
 
-/*********************************************/
-
-void my_logger(size_t ident, const char *format, va_list args) {
-    
-    for (size_t i = 0; i < ident; i++) {
-        printf("  |");
-    }
-
-    vprintf(format, args);
-}
-
-int main() {
-
-    // Classic ASN.1 DER 
-    unsigned char buffer[] = {0x30, 0x23, 0x31, 0x0f, 0x30, 0x0d, 0x06, 0x03, 0x55, 0x04, 0x03,
-                              0x13, 0x06, 0x54, 0x65, 0x73, 0x74, 0x43, 0x4e, 0x31, 0x10, 0x30,
-                              0x0e, 0x06, 0x03, 0x55, 0x04, 0x0a, 0x13, 0x07, 0x54, 0x65, 0x73,
-                              0x74, 0x4f, 0x72, 0x67};
-
-    asn1_tree_t tree;
-    asn1_parser_error_t res = parse(buffer, 37, &tree);
-
-    set_logger(my_logger);
-
-    if (res < PARSER_OK) {
-        printf("Error: 0x%x\n", res);
-        return 1;
-    }
-
-    dump_asn1_tree(tree);
-
-}
 

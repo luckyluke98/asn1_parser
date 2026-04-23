@@ -165,3 +165,102 @@ Below are the common Hex tags for various ASN.1 data types.
 | `0x2B` | EMBEDDED PDV |
 
 > **References & Further Reading:** > [DER Encoding of ASN.1 Types (Microsoft Learn)](https://learn.microsoft.com/en-us/windows/win32/seccertenroll/about-der-encoding-of-asn-1-types)
+
+## 6. Usage
+
+Here is an example of how to use the parser in C. It includes setting up a custom logger callback to format and print the tree structure, parsing a DER-encoded buffer, and handling potential errors.
+
+```c
+#include <stdio.h>
+#include <stdarg.h>
+#include <stddef.h>
+
+#include "asn1_parser.h"
+
+// Custom logger callback function
+void my_logger(size_t ident, const char *format, va_list args) {
+    // Print indentation for the tree structure
+    for (size_t i = 0; i < ident; i++) {
+        printf("  |");
+    }
+    vprintf(format, args);
+}
+
+int main(void) {
+    // Classic ASN.1 DER payload
+    unsigned char buffer[] = {
+        0x30, 0x23, 0x31, 0x0f, 0x30, 0x0d, 0x06, 0x03, 
+        0x55, 0x04, 0x03, 0x13, 0x06, 0x54, 0x65, 0x73, 
+        0x74, 0x43, 0x4e, 0x31, 0x10, 0x30, 0x0e, 0x06, 
+        0x03, 0x55, 0x04, 0x0a, 0x13, 0x07, 0x54, 0x65, 
+        0x73, 0x74, 0x4f, 0x72, 0x67
+    };
+    
+    // Calculate buffer length dynamically instead of hardcoding
+    size_t buffer_len = sizeof(buffer);
+
+    // Set the logger BEFORE parsing so parser logs are also caught
+    set_logger(my_logger);
+
+    asn1_tree_t tree;
+    asn1_parser_error_t res = parse(buffer, buffer_len, &tree);
+
+    if (res < PARSER_OK) {
+        printf("Error: 0x%x\n", res);
+        return 1;
+    }
+
+    // Output the parsed ASN.1 tree
+    dump_asn1_tree(tree);
+
+    return 0;
+}
+```
+
+#### Compilation
+
+Compile the source code using `gcc`. Remember to link your parser implementation if it's in a separate file (e.g., `gcc main.c asn1_parser.c -o asn1_example`):
+
+```bash
+gcc asn1_parser.c -o asn1_example
+```
+
+#### Execution
+
+Run the compiled executable:
+
+```bash
+./asn1_example
+```
+
+### Result Example
+
+```
+ASN1 Node
+Tag: 0x30
+Children(2):
+  |ASN1 Node
+  |Tag: 0x31
+  |Children(1):
+  |  |ASN1 Node
+  |  |Tag: 0x30
+  |  |Children(2):
+  |  |  |ASN1 Node
+  |  |  |Tag: 0x6
+  |  |  |Value (len=3): 0x55 0x4 0x3 
+  |  |  |ASN1 Node
+  |  |  |Tag: 0x13
+  |  |  |Value (len=6): 0x54 0x65 0x73 0x74 0x43 0x4e 
+  |ASN1 Node
+  |Tag: 0x31
+  |Children(1):
+  |  |ASN1 Node
+  |  |Tag: 0x30
+  |  |Children(2):
+  |  |  |ASN1 Node
+  |  |  |Tag: 0x6
+  |  |  |Value (len=3): 0x55 0x4 0xa 
+  |  |  |ASN1 Node
+  |  |  |Tag: 0x13
+  |  |  |Value (len=7): 0x54 0x65 0x73 0x74 0x4f 0x72 0x67
+```
