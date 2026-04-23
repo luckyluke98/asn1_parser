@@ -213,6 +213,8 @@ int main(void) {
     // Output the parsed ASN.1 tree
     dump_asn1_tree(tree);
 
+    asn1_tree_free(&tree);
+
     return 0;
 }
 ```
