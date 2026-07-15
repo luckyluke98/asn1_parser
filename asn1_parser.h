@@ -251,6 +251,8 @@ asn1_parser_error_t parser_stack_top(parser_stack_t *stack, parser_entry_stack_t
 typedef void (*asn1_logger_t)(size_t ident, const char *format, va_list args);
 
 asn1_parser_error_t parse(uint8_t *buffer, size_t len, asn1_node_t **out);
+void set_logger(asn1_logger_t log_cb);
 
+asn1_parser_error_t dump_asn1_tree(asn1_tree_t tree);
 
 #endif // ASN1_PERSER_H

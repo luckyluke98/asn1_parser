@@ -658,7 +658,7 @@ asn1_parser_error_t parse(uint8_t *buffer, size_t len, asn1_node_t **out) {
 
 static asn1_logger_t logger = NULL;
 
-static void set_logger(asn1_logger_t log_cb) {
+void set_logger(asn1_logger_t log_cb) {
     logger = log_cb;
 }
 
